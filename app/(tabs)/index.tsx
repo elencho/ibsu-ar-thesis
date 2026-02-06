@@ -1,98 +1,225 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { Colors } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+interface Product {
+  id: string;
+  name: string;
+  price: string;
+  originalPrice?: string;
+  image: any;
+  discount?: string;
+}
+
+const products: Product[] = [
+  {
+    id: '1',
+    name: 'Modern Sofa',
+    price: '$299.99',
+    originalPrice: '$399.99',
+    discount: '25%',
+    image: require('../../assets/images/sofa.png'),
+  },
+  {
+    id: '2',
+    name: 'Comfortable Chair',
+    price: '$149.99',
+    image: require('../../assets/images/chair.avif'),
+  },
+  {
+    id: '3',
+    name: 'Wooden Table',
+    price: '$199.99',
+    originalPrice: '$249.99',
+    discount: '20%',
+    image: require('../../assets/images/table.jpg'),
+  },
+  {
+    id: '4',
+    name: 'Luxury Armchair',
+    price: '$349.99',
+    image: require('../../assets/images/armchair.jpg'),
+  },
+];
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const colorScheme = useColorScheme();
+  const router = useRouter();
+  const colors = Colors[colorScheme ?? 'light'];
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const handleView3D = (productId: string) => {
+    // Navigate to explore screen for 3D view
+    router.push('/(tabs)/explore');
+  };
+
+  return (
+    <SafeAreaView style={[styles.container, {backgroundColor:'white'}]}>
+    <ThemedView style={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <ThemedText type="title" style={styles.headerTitle}>
+            IBSU thesis Demo
+          </ThemedText>
+          <ThemedText style={styles.headerSubtitle}>
+            Discover our premium furniture pieces
+          </ThemedText>
+        </View>
+
+        <View style={styles.productsGrid}>
+          {products.map((product) => (
+            <View key={product.id} style={[styles.productCard, { backgroundColor: colors.background }]}>
+              <View style={styles.imageContainer}>
+                <Image
+                  source={product.image}
+                  style={styles.productImage}
+                  contentFit="cover"
+                />
+                {product.discount && (
+                  <View style={styles.discountBadge}>
+                    <ThemedText style={styles.discountText}>{product.discount}</ThemedText>
+                  </View>
+                )}
+              </View>
+
+              <View style={styles.productInfo}>
+                <ThemedText type="defaultSemiBold" style={styles.productName} numberOfLines={2}>
+                  {product.name}
+                </ThemedText>
+
+                <View style={styles.priceContainer}>
+                  <ThemedText type="defaultSemiBold" style={styles.price}>
+                    {product.price}
+                  </ThemedText>
+                  {product.originalPrice && (
+                    <ThemedText style={styles.originalPrice}>{product.originalPrice}</ThemedText>
+                  )}
+                </View>
+
+                <TouchableOpacity
+                  style={[styles.view3DButton, { backgroundColor: colors.tint }]}
+                  onPress={() => handleView3D(product.id)}
+                  activeOpacity={0.8}>
+                  <ThemedText style={styles.view3DButtonText}>View in 3D</ThemedText>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+    </ThemedView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
   },
-  stepContainer: {
-    gap: 8,
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 32,
+  },
+  header: {
+    marginBottom: 24,
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  headerSubtitle: {
+    fontSize: 16,
+    opacity: 0.7,
+  },
+  productsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 16,
+  },
+  productCard: {
+    width: '47%',
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  imageContainer: {
+    width: '100%',
+    height: 180,
+    position: 'relative',
+    backgroundColor: '#f5f5f5',
+  },
+  productImage: {
+    width: '100%',
+    height: '100%',
+  },
+  discountBadge: {
     position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: '#FF6B6B',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  discountText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  productInfo: {
+    padding: 12,
+  },
+  productName: {
+    fontSize: 16,
+    marginBottom: 8,
+    minHeight: 40,
+  },
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 8,
+  },
+  price: {
+    fontSize: 18,
+    color: '#0a7ea4',
+  },
+  originalPrice: {
+    fontSize: 14,
+    textDecorationLine: 'line-through',
+    opacity: 0.5,
+  },
+  view3DButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  view3DButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

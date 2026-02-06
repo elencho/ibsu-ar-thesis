@@ -1,0 +1,17 @@
+# Material Template Library file for Koltuk.obj
+# Created for React Native ViroReact
+
+newmtl None
+Ka 0.2 0.2 0.2
+Kd 0.8 0.8 0.8
+Ks 0.0 0.0 0.0
+Ns 10.0
+illum 1
+
+newmtl Material
+Ka 0.2 0.2 0.2
+Kd 0.6 0.4 0.3
+Ks 0.1 0.1 0.1
+Ns 20.0
+illum 2
+
